@@ -3,7 +3,7 @@ from Tkinter import *
 from PIL import Image, ImageTk
 
 class twit:
-    '''This is the twitter object itself'''
+
 
     def __init__(self):
         self.api = twitter.Api(consumer_key='r0S3lRPTio3EZ4Cr78uQ',
@@ -20,7 +20,7 @@ class twit:
 
         
 class client:
-    '''This is the object for the GUI'''
+
 
     def __init__(self, master):
         self.master = master
@@ -34,7 +34,13 @@ class client:
         self.frame = Frame(self.master)
         self.frame.grid()
 
-        self.post_tweet = Text(self.master, width=60, height=5, fg = "gray")
+        
+        # Events are not bound to the object, but a bindtag associated with the object.
+        # (('instance name', 'widget class', '.', 'all')) ---> Default. '.' is the path of the root window.
+        # 'instance name' is the number Tkinter assigns to the widget (eg .1566456), NOT the variable it is stored in.
+        # The 'instance name' binding gets the value, and the 'widget class' binding puts the user input into the widget.
+        # Thus the contents of the widget are retrieved BEFORE the new text is entered, so the counter was always 1 behind.
+        self.post_tweet = Text(self.master, width=60, height=5, fg = "gray", font="Arial")
         self.post_tweet.bindtags((str(self.post_tweet), 'Text', 'post', '.', 'all'))
         self.post_tweet.bind("<Button-1>", self.callback)
         self.post_tweet.bind_class("post", "<Key>", self.count)
@@ -52,11 +58,11 @@ class client:
         self.char_count = Label(self.master, textvariable=self.foo, fg="black")
         self.char_count.grid(column=0, row=2)
 
-        self.friend_tweets = Text(self.master, width=60, height=20, state=DISABLED)
+        self.friend_tweets = Text(self.master, width=60, height=20, font="Arial", state=DISABLED)
         self.friend_tweets.grid(column=0, row=3, sticky=W, padx=15)
 
         self.get_friend_tweets_button = Button(self.master,
-                                          text="Get Statuses!",
+                                          text="Get Recent Tweets!!",
                                           command=self.show_tweets)
         self.get_friend_tweets_button.grid(column=0, row=4, sticky=N+S+W+E, padx=10, pady=10)
 
@@ -64,8 +70,8 @@ class client:
 
     def tweet(self):
         self.tweet_message = self.post_tweet.get(1.0, END)
-        twitter_object.status_update(tweet_message)
-        self.post_tweet.delete(1.0, END) #1.0 meaning line 1, char 0
+        twitter_object.status_update(self.tweet_message)
+        self.post_tweet.delete(1.0, END) # 1.0 meaning line 1, char 0
 
     def show_tweets(self):
         twitter_object.get_friend_statuses()
@@ -81,12 +87,12 @@ class client:
             self.clicked = True
 
     def count(self, event):
-        self.x = len(self.post_tweet.get(1.0, "end-1c"))
-        if self.x > 140:
+        self.tweet_length = len(self.post_tweet.get(1.0, "end-1c")) # -1c deals with the implicit newline at the end of Text.get()
+        if self.tweet_length > 140:
             self.char_count.config(fg="red")
-        elif self.x < 141:
+        elif self.tweet_length < 141:
             self.char_count.config(fg="black")
-        self.foo.set("%s characters left" % (str(140 - self.x)))
+        self.foo.set("%s characters left" % (str(140 - self.tweet_length)))
         
         
 if __name__ == '__main__':
