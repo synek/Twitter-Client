@@ -7,9 +7,9 @@ class twit:
 
     def __init__(self):
         self.api = twitter.Api(consumer_key='r0S3lRPTio3EZ4Cr78uQ',
-                               consumer_secret='Denied!',
+                               consumer_secret='',
                                access_token_key='813019711-9jrsfT6yIJGnJjEhYiCsh0rnpm4el5MRqOKnpKys',
-                               access_token_secret='I\'m not that dumb!')
+                               access_token_secret='')
 
     def status_update(self, message):
         self.api.PostUpdate(message)
